@@ -306,7 +306,7 @@ Private Sub BtnDownload_Click
 	End If
 	job.Release
 	LoadData
-	'AddControls
+	AddControls
 End Sub
 
 Private Sub LoadData
