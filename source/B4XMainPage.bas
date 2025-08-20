@@ -153,9 +153,9 @@ Private Sub ShowDialog (Item As Map, RowId As Long)
 		params.Initialize
 		params.AddAll(Array(Item.Get("Id"), Item.Get("Brand"), Item.Get("Name"), Item.Get("Device"), Item.Get("Model"), Item.Get("Price"))) 'keys based on the template json file
 		If RowId = 0 Then 'new row
-			' Check duplicate Device in sqlite db
-			Dim Query As String = $"SELECT "id" FROM "Devices" WHERE "device" = ?"$
-			Dim RS As ResultSet =  DB.ExecQuery2(Query, Array As String(Item.Get("Device")))
+			' Check duplicate Device and Model in sqlite db
+			Dim Query As String = $"SELECT "id" FROM "Devices" WHERE "device" = ? AND "model" = ?"$
+			Dim RS As ResultSet =  DB.ExecQuery2(Query, Array As String(Item.Get("Device"), Item.Get("Model")))
 			If RS.NextRow Then
 				xui.MsgboxAsync("Device already exist!", "E R R O R")
 				Return
