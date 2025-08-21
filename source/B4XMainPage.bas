@@ -25,6 +25,8 @@ Sub Class_Globals
 	Private DataDir As String = IIf(xui.IsB4J, File.DirApp, xui.DefaultFolder)
 	Private DataFile As String = "Sample.db"
 	Private FirstTime As Boolean = True
+	Private TxtRowId As B4XView
+	Private LastSelectedRowId As Int = -1
 End Sub
 
 Public Sub Initialize
@@ -321,10 +323,21 @@ Private Sub LoadData
 	'B4XTable1.SetData(Data)
 	Wait For (B4XTable1.SetData(Data)) Complete (Unused As Boolean)
 	' Check last 5 rows of in-memory db
-	Dim Query As String = "SELECT * FROM data ORDER BY rowid DESC LIMIT 5"
-	Dim RS As ResultSet = B4XTable1.sql1.ExecQuery(Query)
-	Do While RS.NextRow
-		Log($"${RS.GetString2(0)}|${RS.GetString2(1)}|${RS.GetString2(2)}|${RS.GetString2(3)}|${RS.GetString2(4)}|${RS.GetString2(5)}|${RS.GetDouble2(6)}"$)
-	Loop
-	Log("Loaded")
+	'Dim Query As String = "SELECT * FROM data ORDER BY rowid DESC LIMIT 5"
+	'Dim RS As ResultSet = B4XTable1.sql1.ExecQuery(Query)
+	'Do While RS.NextRow
+	'	Log($"${RS.GetString2(0)}|${RS.GetString2(1)}|${RS.GetString2(2)}|${RS.GetString2(3)}|${RS.GetString2(4)}|${RS.GetString2(5)}|${RS.GetDouble2(6)}"$)
+	'Loop
+	'Log("Loaded")
+End Sub
+
+Private Sub BtnJump_Click
+	If TxtRowId.Text.Length = 0 Then Return
+	LastSelectedRowId = TxtRowId.Text
+	B4XTable1.FirstRowIndex = LastSelectedRowId - 1
+End Sub
+
+Private Sub B4XTable1_CellClicked (ColumnId As String, RowId As Long)
+	LastSelectedRowId = RowId
+	TxtRowId.Text = LastSelectedRowId
 End Sub
