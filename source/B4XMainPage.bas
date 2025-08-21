@@ -24,9 +24,8 @@ Sub Class_Globals
 	Private PrefDialog As PreferencesDialog
 	Private DataDir As String = IIf(xui.IsB4J, File.DirApp, xui.DefaultFolder)
 	Private DataFile As String = "Sample.db"
-	Private FirstTime As Boolean = True
 	Private TxtRowId As B4XView
-	Private LastSelectedRowId As Int = -1
+	Private LastSelectedRowId As Int
 End Sub
 
 Public Sub Initialize
@@ -38,13 +37,9 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	Root.LoadLayout("Table")
 	B4XPages.SetTitle(Me, "Android Devices")
 	InitDatabase
-	CreateColumns
-	B4XTable1.RowHeight = 40dip
-	If FirstTime = False Then
-		LoadData
-		AddControls
-	End If
 	CreateDialog
+	B4XTable1.RowHeight = 40dip
+	BtnRefresh_Click
 End Sub
 
 Private Sub B4XPage_Resize (Width As Int, Height As Int)
@@ -71,7 +66,6 @@ Private Sub InitDatabase
 		End If
 	Else
 		DB.InitializeSQLite(DataDir, DataFile, False)
-		FirstTime = False
 	End If
 End Sub
 
@@ -174,9 +168,11 @@ Private Sub ShowDialog (Item As Map, RowId As Long)
 			RS.Close
 			params.Set(0, newID) ' Replace the id as params.Get(0)
 			B4XTable1.sql1.ExecNonQuery2($"INSERT INTO data (c0, c1, c2, c3, c4, c5, c6) VALUES ("", ?, ?, ?, ?, ?, ?)"$, params)
-			B4XTable1.ClearDataView
 			' Let's show last page
-			GotoLastPage
+			'B4XTable1.ClearDataView
+			'GotoLastPage
+			' Stay at current page but update paging and labels
+			B4XTable1.UpdateTableCounters
 		Else
 			params.Add(RowId) ' Add the selected rowid as params.Get(6)
 			' Check duplicate Device in sqlite db
@@ -207,12 +203,12 @@ Private Sub GetRowId (View As B4XView) As Long
 End Sub
 
 ' Code adapted from B4XTable's lblLast_Click
-Private Sub GotoLastPage
-	Dim CurrentCount As Int = B4XTable1.mCurrentCount
-	Dim RowsPerPage As Int = B4XTable1.RowsPerPage
-	Dim NumberOfPages As Int = Ceil(CurrentCount / RowsPerPage)
-	B4XTable1.FirstRowIndex = (NumberOfPages - 1) * RowsPerPage
-End Sub
+'Private Sub GotoLastPage
+'	Dim CurrentCount As Int = B4XTable1.mCurrentCount
+'	Dim RowsPerPage As Int = B4XTable1.RowsPerPage
+'	Dim NumberOfPages As Int = Ceil(CurrentCount / RowsPerPage)
+'	B4XTable1.FirstRowIndex = (NumberOfPages - 1) * RowsPerPage
+'End Sub
 
 Private Sub B4XTable1_DataUpdated
 	For i = 0 To B4XTable1.VisibleRowIds.Size - 1
@@ -261,8 +257,10 @@ Private Sub BtnDelete_Click
 		' Remove from in-memory db
 		Dim Query As String = "DELETE FROM data WHERE rowid = ?"
 		B4XTable1.sql1.ExecNonQuery2(Query, Array(RowId))
-		B4XTable1.ClearDataView 'update the table
-		B4XTable1.Refresh
+		'B4XTable1.ClearDataView 'update the table
+		'B4XTable1.Refresh
+		' Stay at current page but update paging and labels
+		B4XTable1.UpdateTableCounters
 	End If
 End Sub
 
@@ -307,8 +305,7 @@ Private Sub BtnDownload_Click
 		Log(job.ErrorMessage)
 	End If
 	job.Release
-	LoadData
-	AddControls
+	BtnRefresh_Click
 End Sub
 
 Private Sub LoadData
@@ -340,4 +337,11 @@ End Sub
 Private Sub B4XTable1_CellClicked (ColumnId As String, RowId As Long)
 	LastSelectedRowId = RowId
 	TxtRowId.Text = LastSelectedRowId
+End Sub
+
+Private Sub BtnRefresh_Click
+	B4XTable1.Clear
+	CreateColumns
+	LoadData
+	AddControls
 End Sub
