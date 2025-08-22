@@ -5,7 +5,7 @@ Type=Class
 Version=9.85
 @EndOfDesignText@
 #Region Shared Files
-'#CustomBuildAction: folders ready, %WINDIR%\System32\Robocopy.exe,"..\..\Shared Files" "..\Files"
+#CustomBuildAction: folders ready, %WINDIR%\System32\Robocopy.exe,"..\..\Shared Files" "..\Files"
 #Macro: Title, Top, ide://goto?Module=B4XMainPage
 #Macro: Title, ShowDialog, ide://goto?Module=B4XMainPage&Sub=ShowDialog
 #Macro: Title, Export, ide://run?File=%B4X%\Zipper.jar&Args=%PROJECT_NAME%.zip
