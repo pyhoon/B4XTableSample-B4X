@@ -241,9 +241,9 @@ Private Sub B4XTable1_DataUpdated
 	B4XTable1.lblFromTo.Width = 260dip
 	B4XTable1.lblNumber.Parent.Width = 260dip
 	B4XTable1.lblNumber.Width = B4XTable1.lblNumber.Parent.Width - 146dip
-	'B4XTable1.lblNumber.Parent.Left = B4XTable1.SearchField.mBase.Left - B4XTable1.lblNumber.Parent.Width - 5dip
-	'B4XTable1.lblLast.Left = B4XTable1.lblLast.Parent.Width - B4XTable1.lblLast.Width
-	'B4XTable1.lblNext.Left = B4XTable1.lblLast.Left - B4XTable1.lblNext.Width
+	B4XTable1.lblNumber.Parent.Left = B4XTable1.SearchField.mBase.Left - B4XTable1.lblNumber.Parent.Width - 5dip
+	B4XTable1.lblLast.Left = B4XTable1.lblLast.Parent.Width - B4XTable1.lblLast.Width
+	B4XTable1.lblNext.Left = B4XTable1.lblLast.Left - B4XTable1.lblNext.Width
 	#Else If B4A
 	B4XTable1.lblNumber.Parent.Width = 380dip
 	B4XTable1.lblNumber.Width = B4XTable1.lblNumber.Parent.Width - 146dip
