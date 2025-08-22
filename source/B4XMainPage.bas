@@ -20,7 +20,7 @@ Sub Class_Globals
 	Private DB As SQL
 	Private xui As XUI
 	Private Root As B4XView
-	Private TxtRowNum As B4XView
+	Private TxtDataId As B4XView
 	Private B4XTable1 As B4XTable
 	Private EditColumn As B4XTableColumn
 	Private PriceColumn As B4XTableColumn
@@ -31,7 +31,6 @@ Sub Class_Globals
 	Private DataDir As String = xui.DefaultFolder
 	#End If
 	Private DataFile As String = "Sample.db"
-	Private LastRowNum As Int
 End Sub
 
 Public Sub Initialize
@@ -160,8 +159,8 @@ Private Sub ShowDialog (Item As Map, RowId As Long)
 		If RowId = 0 Then 'new row
 			' Check duplicate Device and Model in sqlite db
 			Dim Query As String = $"SELECT "id" FROM "Devices" WHERE "device" = ? AND "model" = ?"$
-			Dim RS As ResultSet =  DB.ExecQuery2(Query, Array As String(Item.Get("Device"), Item.Get("Model"))) ' use values from item map
-			'Dim RS As ResultSet =  DB.ExecQuery2(Query, Array As String(params.Get(3), params.Get(4)))			' or use values from params list (index can be confusing)
+			Dim RS As ResultSet = DB.ExecQuery2(Query, Array As String(Item.Get("Device"), Item.Get("Model"))) ' use values from item map
+			'Dim RS As ResultSet = DB.ExecQuery2(Query, Array As String(params.Get(3), params.Get(4)))			' or use values from params list (index can be confusing)
 			If RS.NextRow Then
 				xui.MsgboxAsync("Device already exist!", "E R R O R")
 				Return
@@ -192,8 +191,8 @@ Private Sub ShowDialog (Item As Map, RowId As Long)
 			' Check duplicate Device and Model in sqlite db
 			Dim Found As Boolean
 			Dim Query As String = $"SELECT "id" FROM "Devices" WHERE "device" = ? AND "model" = ? AND "id" <> ?"$
-			Dim RS As ResultSet =  DB.ExecQuery2(Query, Array As String(Item.Get("Device"), Item.Get("Model"), Item.Get("Id")))
-			'Dim RS As ResultSet =  DB.ExecQuery2(Query, Array As String(params.Get(3), params.Get(4), params.Get(0)))
+			Dim RS As ResultSet = DB.ExecQuery2(Query, Array As String(Item.Get("Device"), Item.Get("Model"), Item.Get("Id")))
+			'Dim RS As ResultSet = DB.ExecQuery2(Query, Array As String(params.Get(3), params.Get(4), params.Get(0)))
 			If RS.NextRow Then
 				Found = True
 			End If
@@ -347,8 +346,8 @@ Private Sub LoadData
 	Loop
 	RS1.Close
 	Wait For (B4XTable1.SetData(Data)) Complete (Unused As Boolean)
-	' Check last 5 rows of in-memory db
-	'Dim Query As String = "SELECT * FROM data ORDER BY rowid DESC LIMIT 5"
+	' Check first row of in-memory db
+	'Dim Query As String = "SELECT * FROM data LIMIT 1"
 	'Dim RS2 As ResultSet = B4XTable1.sql1.ExecQuery(Query)
 	'Do While RS2.NextRow
 	'	Log($"${RS2.GetString2(0)}|${RS2.GetString2(1)}|${RS2.GetString2(2)}|${RS2.GetString2(3)}|${RS2.GetString2(4)}|${RS2.GetString2(5)}|${RS2.GetDouble2(6)}"$)
@@ -358,14 +357,13 @@ Private Sub LoadData
 End Sub
 
 Private Sub BtnJump_Click
-	If TxtRowNum.Text.Length = 0 Then Return
-	LastRowNum = TxtRowNum.Text
-	B4XTable1.FirstRowIndex = LastRowNum - 1
+	If TxtDataId.Text.Length = 0 Then Return
+	B4XTable1.CreateDataView("c1 >= " & TxtDataId.Text)
 End Sub
 
 Private Sub B4XTable1_CellClicked (ColumnId As String, RowId As Long)
-	LastRowNum = RowId
-	TxtRowNum.Text = LastRowNum
+	Dim item As Map = B4XTable1.GetRow(RowId)
+	TxtDataId.Text = item.Get("Id")
 End Sub
 
 Private Sub BtnRefresh_Click
