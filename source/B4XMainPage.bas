@@ -5,15 +5,15 @@ Type=Class
 Version=9.85
 @EndOfDesignText@
 #Region Shared Files
+'#CustomBuildAction: folders ready, %WINDIR%\System32\Robocopy.exe,"..\..\Shared Files" "..\Files"
 #Macro: Title, Top, ide://goto?Module=B4XMainPage
 #Macro: Title, ShowDialog, ide://goto?Module=B4XMainPage&Sub=ShowDialog
 #Macro: Title, Export, ide://run?File=%B4X%\Zipper.jar&Args=%PROJECT_NAME%.zip
 #Macro: Title, Project, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\..\
-#Macro: Title, GitHub, ide://run?file=%WINDIR%\System32\cmd.exe&Args=/c&Args=github&Args=..\..\
-'#Macro: Title, Sync Files, ide://run?file=%WINDIR%\System32\Robocopy.exe&args=..\..\Shared+Files&args=..\Files&FilesSync=True
+'#Macro: Title, GitHub, ide://run?file=%WINDIR%\System32\cmd.exe&Args=/c&Args=github&Args=..\..\
 '#Macro: Title, JsonLayouts folder, ide://run?File=%WINDIR%\explorer.exe&Args=%PROJECT%\JsonLayouts
 '#Macro: After Save, Sync Layouts, ide://run?File=%ADDITIONAL%\..\B4X\JsonLayouts.jar&Args=%PROJECT%&Args=%PROJECT_NAME%
-'#CustomBuildAction: folders ready, %WINDIR%\System32\Robocopy.exe,"..\..\Shared Files" "..\Files"
+'Sync files: ide://run?file=%WINDIR%\System32\Robocopy.exe&args=..\..\Shared+Files&args=..\Files&FilesSync=True
 #End Region
 
 Sub Class_Globals
@@ -25,7 +25,11 @@ Sub Class_Globals
 	Private EditColumn As B4XTableColumn
 	Private PriceColumn As B4XTableColumn
 	Private PrefDialog As PreferencesDialog
-	Private DataDir As String = IIf(xui.IsB4J, File.DirApp, xui.DefaultFolder)
+	#If B4J
+	Private DataDir As String = File.DirApp
+	#Else
+	Private DataDir As String = xui.DefaultFolder
+	#End If
 	Private DataFile As String = "Sample.db"
 	Private LastRowNum As Int
 End Sub
@@ -50,7 +54,11 @@ End Sub
 
 Private Sub InitDatabase
 	If File.Exists(DataDir, DataFile) = False Then
+		#If B4J
 		DB.InitializeSQLite(DataDir, DataFile, True)
+		#Else
+		DB.Initialize(DataDir, DataFile, True)
+		#End If
 		Dim Query As String = $"CREATE TABLE IF NOT EXISTS "Devices" (
 		"id"		INTEGER PRIMARY KEY AUTOINCREMENT,
 		"brand"		TEXT DEFAULT '',
@@ -67,7 +75,11 @@ Private Sub InitDatabase
 			LogColor(LastException.Message, xui.Color_Red)
 		End If
 	Else
+		#If B4J
 		DB.InitializeSQLite(DataDir, DataFile, False)
+		#Else
+		DB.Initialize(DataDir, DataFile, False)
+		#End If
 	End If
 End Sub
 
@@ -117,7 +129,11 @@ End Sub
 Sub CreateButton (EventName As String, Text As String) As B4XView
 	Dim Btn As Button
 	Dim FontSize As Int = 12
+	#If B4i
+	Btn.Initialize(EventName,Btn.STYLE_SYSTEM)
+	#Else
 	Btn.Initialize(EventName)
+	#End If
 	Dim x As B4XView = Btn
 	x.Font = xui.CreateFontAwesome(FontSize)
 	x.Visible = False
@@ -220,6 +236,7 @@ Private Sub B4XTable1_DataUpdated
 		p.GetView(2).Visible = p.GetView(1).Visible
 		p.GetView(3).Visible = p.GetView(1).Visible
 	Next
+	#If B4J
 	' Adjust labels width
 	B4XTable1.lblFromTo.Width = 260dip
 	B4XTable1.lblNumber.Parent.Width = 260dip
@@ -227,6 +244,7 @@ Private Sub B4XTable1_DataUpdated
 	B4XTable1.lblNumber.Parent.Left = B4XTable1.SearchField.mBase.Left - B4XTable1.lblNumber.Parent.Width - 5dip
 	B4XTable1.lblLast.Left = B4XTable1.lblLast.Parent.Width - B4XTable1.lblLast.Width
 	B4XTable1.lblNext.Left = B4XTable1.lblLast.Left - B4XTable1.lblNext.Width	
+	#End If
 End Sub
 
 Private Sub BtnAdd_Click

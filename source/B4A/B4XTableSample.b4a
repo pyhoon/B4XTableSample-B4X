@@ -1,14 +1,21 @@
 ﻿Build1=Default,b4a.example
-File1=MainPage.bal
+File1=Table.bal
+File2=template.json
 FileGroup1=Default Group
+FileGroup2=Default Group
 Group=Default Group
-Library1=core
-Library2=b4xpages
+Library1=b4xpages
+Library2=b4xpreferencesdialog
+Library3=b4xtable
+Library4=core
+Library5=okhttputils2
+Library6=sql
+Library7=json
 ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: https://www.b4x.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="35"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~CreateResourceFromFile(Macro, Themes.LightTheme)~\n~'End of default text.~\n~
 Module1=|relative|..\B4XMainPage
 Module2=Starter
-NumberOfFiles=1
-NumberOfLibraries=2
+NumberOfFiles=2
+NumberOfLibraries=7
 NumberOfModules=2
 Version=13.4
 @EndOfDesignText@
@@ -17,7 +24,7 @@ Version=13.4
 	#VersionCode: 1
 	#VersionName: 
 	'SupportedOrientations possible values: unspecified, landscape or portrait.
-	#SupportedOrientations: portrait
+	#SupportedOrientations: landscape
 	#CanInstallToExternalStorage: False
 #End Region
 
