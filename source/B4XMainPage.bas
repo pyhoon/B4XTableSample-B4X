@@ -312,20 +312,20 @@ Private Sub LoadData
 	Dim Data As List
 	Data.Initialize
 	Dim Query As String = $"SELECT "id", "brand", "name", "device", "model", "price" FROM "Devices""$
-	Dim RS As ResultSet = DB.ExecQuery(Query)
-	Do While RS.NextRow
-		Data.Add(Array("", RS.GetInt("id"), RS.GetString("brand"), RS.GetString("name"), RS.GetString("device"), RS.GetString("model"), RS.GetDouble("price")))
+	Dim RS1 As ResultSet = DB.ExecQuery(Query)
+	Do While RS1.NextRow
+		Data.Add(Array("", RS1.GetInt("id"), RS1.GetString("brand"), RS1.GetString("name"), RS1.GetString("device"), RS1.GetString("model"), RS1.GetDouble("price")))
 	Loop
-	RS.Close
-	'B4XTable1.SetData(Data)
+	RS1.Close
 	Wait For (B4XTable1.SetData(Data)) Complete (Unused As Boolean)
 	' Check last 5 rows of in-memory db
-	'Dim Query As String = "SELECT * FROM data ORDER BY rowid DESC LIMIT 5"
-	'Dim RS As ResultSet = B4XTable1.sql1.ExecQuery(Query)
-	'Do While RS.NextRow
-	'	Log($"${RS.GetString2(0)}|${RS.GetString2(1)}|${RS.GetString2(2)}|${RS.GetString2(3)}|${RS.GetString2(4)}|${RS.GetString2(5)}|${RS.GetDouble2(6)}"$)
-	'Loop
-	'Log("Loaded")
+	Dim Query As String = "SELECT * FROM data ORDER BY rowid DESC LIMIT 5"
+	Dim RS2 As ResultSet = B4XTable1.sql1.ExecQuery(Query)
+	Do While RS2.NextRow
+		Log($"${RS2.GetString2(0)}|${RS2.GetString2(1)}|${RS2.GetString2(2)}|${RS2.GetString2(3)}|${RS2.GetString2(4)}|${RS2.GetString2(5)}|${RS2.GetDouble2(6)}"$)
+	Loop
+	RS2.Close
+	Log("Loaded")
 End Sub
 
 Private Sub BtnJump_Click
