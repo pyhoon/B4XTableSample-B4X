@@ -1,5 +1,5 @@
 # B4XTableSample-B4X
-A sample project to demonstrate loading data into B4XTable
+A sample project to demonstrate loading SQLite data into B4XTable
 
 ## Features:
 - Use OkHttpUtils to download json file from a URL
