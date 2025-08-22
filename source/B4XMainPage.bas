@@ -193,7 +193,7 @@ Private Sub ShowDialog (Item As Map, RowId As Long)
 			Dim Found As Boolean
 			Dim Query As String = $"SELECT "id" FROM "Devices" WHERE "device" = ? AND "model" = ? AND "id" <> ?"$
 			Dim RS As ResultSet =  DB.ExecQuery2(Query, Array As String(Item.Get("Device"), Item.Get("Model"), Item.Get("Id")))
-			'Dim RS As ResultSet =  DB.ExecQuery2(Query, Array As String(params.Get(3), params.Get(0)))
+			'Dim RS As ResultSet =  DB.ExecQuery2(Query, Array As String(params.Get(3), params.Get(4), params.Get(0)))
 			If RS.NextRow Then
 				Found = True
 			End If
