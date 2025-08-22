@@ -203,12 +203,12 @@ Private Sub GetRowId (View As B4XView) As Long
 End Sub
 
 ' Code adapted from B4XTable's lblLast_Click
-'Private Sub GotoLastPage
-'	Dim CurrentCount As Int = B4XTable1.mCurrentCount
-'	Dim RowsPerPage As Int = B4XTable1.RowsPerPage
-'	Dim NumberOfPages As Int = Ceil(CurrentCount / RowsPerPage)
-'	B4XTable1.FirstRowIndex = (NumberOfPages - 1) * RowsPerPage
-'End Sub
+Private Sub GotoLastPage 'ignore
+	Dim CurrentCount As Int = B4XTable1.mCurrentCount
+	Dim RowsPerPage As Int = B4XTable1.RowsPerPage
+	Dim NumberOfPages As Int = Ceil(CurrentCount / RowsPerPage)
+	B4XTable1.FirstRowIndex = (NumberOfPages - 1) * RowsPerPage
+End Sub
 
 Private Sub B4XTable1_DataUpdated
 	For i = 0 To B4XTable1.VisibleRowIds.Size - 1
