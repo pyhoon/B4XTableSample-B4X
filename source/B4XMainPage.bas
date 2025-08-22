@@ -5,10 +5,12 @@ Type=Class
 Version=9.85
 @EndOfDesignText@
 #Region Shared Files
+#Macro: Title, Top, ide://goto?Module=B4XMainPage
+#Macro: Title, ShowDialog, ide://goto?Module=B4XMainPage&Sub=ShowDialog
 #Macro: Title, Export, ide://run?File=%B4X%\Zipper.jar&Args=%PROJECT_NAME%.zip
 #Macro: Title, Project, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\..\
 #Macro: Title, GitHub, ide://run?file=%WINDIR%\System32\cmd.exe&Args=/c&Args=github&Args=..\..\
-#Macro: Title, Sync Files, ide://run?file=%WINDIR%\System32\Robocopy.exe&args=..\..\Shared+Files&args=..\Files&FilesSync=True
+'#Macro: Title, Sync Files, ide://run?file=%WINDIR%\System32\Robocopy.exe&args=..\..\Shared+Files&args=..\Files&FilesSync=True
 '#Macro: Title, JsonLayouts folder, ide://run?File=%WINDIR%\explorer.exe&Args=%PROJECT%\JsonLayouts
 '#Macro: After Save, Sync Layouts, ide://run?File=%ADDITIONAL%\..\B4X\JsonLayouts.jar&Args=%PROJECT%&Args=%PROJECT_NAME%
 '#CustomBuildAction: folders ready, %WINDIR%\System32\Robocopy.exe,"..\..\Shared Files" "..\Files"
@@ -18,14 +20,14 @@ Sub Class_Globals
 	Private DB As SQL
 	Private xui As XUI
 	Private Root As B4XView
+	Private TxtRowNum As B4XView
 	Private B4XTable1 As B4XTable
 	Private EditColumn As B4XTableColumn
 	Private PriceColumn As B4XTableColumn
 	Private PrefDialog As PreferencesDialog
 	Private DataDir As String = IIf(xui.IsB4J, File.DirApp, xui.DefaultFolder)
 	Private DataFile As String = "Sample.db"
-	Private TxtRowId As B4XView
-	Private LastSelectedRowId As Int
+	Private LastRowNum As Int
 End Sub
 
 Public Sub Initialize
@@ -50,13 +52,13 @@ Private Sub InitDatabase
 	If File.Exists(DataDir, DataFile) = False Then
 		DB.InitializeSQLite(DataDir, DataFile, True)
 		Dim Query As String = $"CREATE TABLE IF NOT EXISTS "Devices" (
-			"id"		INTEGER PRIMARY KEY AUTOINCREMENT,
-			"brand"		TEXT DEFAULT '',
-			"name"		TEXT DEFAULT '',
-			"device"	TEXT DEFAULT '',
-			"model"		TEXT DEFAULT '',
-			"price"		NUMERIC DEFAULT 0
-			)"$
+		"id"		INTEGER PRIMARY KEY AUTOINCREMENT,
+		"brand"		TEXT DEFAULT '',
+		"name"		TEXT DEFAULT '',
+		"device"	TEXT DEFAULT '',
+		"model"		TEXT DEFAULT '',
+		"price"		NUMERIC DEFAULT 0
+		)"$
 		DB.AddNonQueryToBatch(Query, Null)
 		Dim sf As Object = DB.ExecNonQueryBatch("SQL")
 		Wait For (sf) SQL_NonQueryComplete (Success As Boolean)
@@ -69,7 +71,6 @@ Private Sub InitDatabase
 	End If
 End Sub
 
-' Total Columns: 7
 Private Sub CreateColumns
 	EditColumn = B4XTable1.AddColumn("Edit", B4XTable1.COLUMN_TYPE_TEXT)
 	EditColumn.Sortable = False
@@ -128,20 +129,11 @@ Private Sub CreateDialog
 	PrefDialog.Initialize(Root, "Add/Edit Device", 600dip, 330dip)
 	PrefDialog.Theme = PrefDialog.THEME_LIGHT
 	PrefDialog.LoadFromJson(File.ReadString(File.DirAssets, "template.json"))
-	'PrefDialog.SearchTemplate.MaxNumberOfItemsToShow = 300
 End Sub
 
 Private Sub ShowDialog (Item As Map, RowId As Long)
 	Dim sf As Object = PrefDialog.ShowDialog(Item, "OK", "CANCEL")
 	PrefDialog.Dialog.Base.Top = 100dip ' Make it lower
-	'Dim pi As B4XPrefItem = PrefDialog.GetPrefItem("Brand") ' <-- Disallow edit on Brand
-	'PrefDialog.CustomListView1.AnimationDuration = 0
-	'If pi.ItemType = PrefDialog.TYPE_TEXT Then
-	'	Dim pnl As B4XView = PrefDialog.CustomListView1.GetPanel(0)
-	'	Dim ft As B4XFloatTextField = pnl.GetView(0).Tag
-	'	ft.mBase.Enabled = False
-	'End If
-
 	Wait For (sf) Complete (Result As Int)
 	If Result = xui.DialogResponse_Positive Then
 		' Convert item map to list of params for SQL query
@@ -151,14 +143,17 @@ Private Sub ShowDialog (Item As Map, RowId As Long)
 		If RowId = 0 Then 'new row
 			' Check duplicate Device and Model in sqlite db
 			Dim Query As String = $"SELECT "id" FROM "Devices" WHERE "device" = ? AND "model" = ?"$
-			Dim RS As ResultSet =  DB.ExecQuery2(Query, Array As String(Item.Get("Device"), Item.Get("Model")))
+			Dim RS As ResultSet =  DB.ExecQuery2(Query, Array As String(Item.Get("Device"), Item.Get("Model"))) ' use values from item map
+			'Dim RS As ResultSet =  DB.ExecQuery2(Query, Array As String(params.Get(3), params.Get(4)))			' or use values from params list (index can be confusing)
 			If RS.NextRow Then
 				xui.MsgboxAsync("Device already exist!", "E R R O R")
 				Return
 			End If
 			' Insert new Device in sqlite db
 			Dim Query As String = $"INSERT INTO "Devices" ("brand", "name", "device", "model", "price") VALUES (?, ?, ?, ?, ?)"$
-			DB.ExecNonQuery2(Query, Array As String(params.Get(1), params.Get(2), params.Get(3), params.Get(4), params.Get(5)))
+			DB.ExecNonQuery2(Query, Array As String(Item.Get("Brand"), Item.Get("Name"), Item.Get("Device"), Item.Get("Model"), Item.Get("Price")))
+			'DB.ExecNonQuery2(Query, Array As String(params.Get(1), params.Get(2), params.Get(3), params.Get(4), params.Get(5)))
+			
 			' Get freshly inserted id from sqlite db
 			Dim newID As Int
 			Dim RS As ResultSet = DB.ExecQuery("SELECT LAST_INSERT_ROWID()")
@@ -166,23 +161,31 @@ Private Sub ShowDialog (Item As Map, RowId As Long)
 				newID = RS.GetInt2(0)
 			Loop
 			RS.Close
+			
 			params.Set(0, newID) ' Replace the id as params.Get(0)
 			B4XTable1.sql1.ExecNonQuery2($"INSERT INTO data (c0, c1, c2, c3, c4, c5, c6) VALUES ("", ?, ?, ?, ?, ?, ?)"$, params)
-			' Let's show last page
 			'B4XTable1.ClearDataView
+			' Let's show last page
 			'GotoLastPage
 			' Stay at current page but update paging and labels
 			B4XTable1.UpdateTableCounters
 		Else
 			params.Add(RowId) ' Add the selected rowid as params.Get(6)
-			' Check duplicate Device in sqlite db
-			Query = $"SELECT "id" FROM "Devices" WHERE "device" = ? AND "id" <> ?"$
-			Dim RS As ResultSet =  DB.ExecQuery2(Query, Array As String(Item.Get("Device"), Item.Get("Id")))	' use values from item map
-			'Dim RS As ResultSet =  DB.ExecQuery2(Query, Array As String(params.Get(3), params.Get(0)))			' or use values params list (index can be confusing)
+			
+			' Check duplicate Device and Model in sqlite db
+			Dim Found As Boolean
+			Dim Query As String = $"SELECT "id" FROM "Devices" WHERE "device" = ? AND "model" = ? AND "id" <> ?"$
+			Dim RS As ResultSet =  DB.ExecQuery2(Query, Array As String(Item.Get("Device"), Item.Get("Model"), Item.Get("Id")))
+			'Dim RS As ResultSet =  DB.ExecQuery2(Query, Array As String(params.Get(3), params.Get(0)))
 			If RS.NextRow Then
+				Found = True
+			End If
+			RS.Close
+			If Found Then
 				xui.MsgboxAsync("Device with another id already exist!", "E R R O R")
 				Return
 			End If
+
 			' Update data in sqlite db
 			Dim Query As String = $"UPDATE "Devices" SET "brand" = ?, "name" = ?, "device" = ?, "model" = ?, "price" = ? WHERE "id" = ?"$
 			DB.ExecNonQuery2(Query, Array As String(Item.Get("Brand"), Item.Get("Name"), Item.Get("Device"), Item.Get("Model"), Item.Get("Price"), Item.Get("Id")))
@@ -217,7 +220,7 @@ Private Sub B4XTable1_DataUpdated
 		p.GetView(2).Visible = p.GetView(1).Visible
 		p.GetView(3).Visible = p.GetView(1).Visible
 	Next
-	'Log(B4XTable1.lblFromTo.Width) '180dip
+	' Adjust labels width
 	B4XTable1.lblFromTo.Width = 260dip
 	B4XTable1.lblNumber.Parent.Width = 260dip
 	B4XTable1.lblNumber.Width = B4XTable1.lblNumber.Parent.Width - 146dip
@@ -305,6 +308,7 @@ Private Sub BtnDownload_Click
 		Log(job.ErrorMessage)
 	End If
 	job.Release
+	' Show the data
 	BtnRefresh_Click
 End Sub
 
@@ -319,24 +323,24 @@ Private Sub LoadData
 	RS1.Close
 	Wait For (B4XTable1.SetData(Data)) Complete (Unused As Boolean)
 	' Check last 5 rows of in-memory db
-	Dim Query As String = "SELECT * FROM data ORDER BY rowid DESC LIMIT 5"
-	Dim RS2 As ResultSet = B4XTable1.sql1.ExecQuery(Query)
-	Do While RS2.NextRow
-		Log($"${RS2.GetString2(0)}|${RS2.GetString2(1)}|${RS2.GetString2(2)}|${RS2.GetString2(3)}|${RS2.GetString2(4)}|${RS2.GetString2(5)}|${RS2.GetDouble2(6)}"$)
-	Loop
-	RS2.Close
+	'Dim Query As String = "SELECT * FROM data ORDER BY rowid DESC LIMIT 5"
+	'Dim RS2 As ResultSet = B4XTable1.sql1.ExecQuery(Query)
+	'Do While RS2.NextRow
+	'	Log($"${RS2.GetString2(0)}|${RS2.GetString2(1)}|${RS2.GetString2(2)}|${RS2.GetString2(3)}|${RS2.GetString2(4)}|${RS2.GetString2(5)}|${RS2.GetDouble2(6)}"$)
+	'Loop
+	'RS2.Close
 	Log("Loaded")
 End Sub
 
 Private Sub BtnJump_Click
-	If TxtRowId.Text.Length = 0 Then Return
-	LastSelectedRowId = TxtRowId.Text
-	B4XTable1.FirstRowIndex = LastSelectedRowId - 1
+	If TxtRowNum.Text.Length = 0 Then Return
+	LastRowNum = TxtRowNum.Text
+	B4XTable1.FirstRowIndex = LastRowNum - 1
 End Sub
 
 Private Sub B4XTable1_CellClicked (ColumnId As String, RowId As Long)
-	LastSelectedRowId = RowId
-	TxtRowId.Text = LastSelectedRowId
+	LastRowNum = RowId
+	TxtRowNum.Text = LastRowNum
 End Sub
 
 Private Sub BtnRefresh_Click
