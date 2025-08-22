@@ -130,7 +130,8 @@ Sub CreateButton (EventName As String, Text As String) As B4XView
 	Dim Btn As Button
 	Dim FontSize As Int = 12
 	#If B4i
-	Btn.Initialize(EventName,Btn.STYLE_SYSTEM)
+	'Btn.Initialize(EventName,Btn.STYLE_SYSTEM)
+	Btn.InitializeCustom(EventName, xui.Color_Black, xui.Color_White)
 	#Else
 	Btn.Initialize(EventName)
 	#End If
