@@ -149,7 +149,7 @@ End Sub
 
 Private Sub ShowDialog (Item As Map, RowId As Long)
 	Dim sf As Object = PrefDialog.ShowDialog(Item, "OK", "CANCEL")
-	PrefDialog.Dialog.Base.Top = 100dip ' Make it lower
+	'PrefDialog.Dialog.Base.Top = 100dip ' Make it lower
 	Wait For (sf) Complete (Result As Int)
 	If Result = xui.DialogResponse_Positive Then
 		' Convert item map to list of params for SQL query
