@@ -7,7 +7,7 @@ A sample project to demonstrate loading SQLite data into B4XTable
 - Store the data into SQLite database
 - Perform CRUD functions like add, retrieve, edit, delete rows
 - Use B4XPreferencesDialog to show the panel for input
-- Jump to a row in B4XTable
+- Jump to an Id of row in SQLite
 
 ## Why I created this sample project
 B4X developers often confuse or don't understand how to load and save data between an SQL database and use B4XTable to display the data. 
