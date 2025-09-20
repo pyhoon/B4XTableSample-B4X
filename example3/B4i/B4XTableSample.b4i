@@ -6,10 +6,11 @@ Library1=b4xpages
 Library2=b4xpreferencesdialog
 Library3=b4xtable
 Library4=icore
-Library5=isql
+Library5=minimalistutils
+Library6=keyvaluestore
 Module1=|relative|..\B4XMainPage
 NumberOfFiles=1
-NumberOfLibraries=5
+NumberOfLibraries=6
 NumberOfModules=1
 Version=8.8
 @EndOfDesignText@

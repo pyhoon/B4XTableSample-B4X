@@ -10,10 +10,11 @@ Library2=b4xpreferencesdialog
 Library3=b4xtable
 Library4=jcore
 Library5=jfx
-Library6=jsql
+Library6=keyvaluestore
+Library7=minimalistutils
 Module1=|relative|..\B4XMainPage
 NumberOfFiles=2
-NumberOfLibraries=6
+NumberOfLibraries=7
 NumberOfModules=1
 Version=10.3
 @EndOfDesignText@
@@ -21,7 +22,6 @@ Version=10.3
 	#MainFormWidth: 1000
 	#MainFormHeight: 500
 #End Region
-#AdditionalJar: sqlite-jdbc-3.7.2
 
 Sub Process_Globals
 	Private fx As JFX
