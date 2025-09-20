@@ -25,4 +25,4 @@ Another example to demonstrate loading SQLite data into B4XTable \
 It uses fictional Customers data inserted from code
 
 ## Example 3
-This example is modified from Example 2 but instead of using SQLite, it uses **MinimaListUtils** and **KeyValueStore**.
+This example is modified from Example 2 but instead of using SQLite, it uses **[MinimaListUtils](https://github.com/pyhoon/MinimaListUtils-B4X)** and **KeyValueStore**.
