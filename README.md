@@ -15,3 +15,6 @@ B4XTable uses a in-memory database for it's internal operation. It has a single 
 Developers should not mix the internal db with their actual database. 
 This sample shows how we can interact and work with B4XTable by connecting it to a SQLite database.
 In fact, B4XTable is so powerful that it actually can work with CSV files or non SQL database.
+
+## Example 3
+This example is modified from example2 but instead of using SQLite, it uses **MinimaListUtils** and **KeyValueStore**.
