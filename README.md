@@ -16,5 +16,13 @@ Developers should not mix the internal db with their actual database.
 This sample shows how we can interact and work with B4XTable by connecting it to a SQLite database.
 In fact, B4XTable is so powerful that it actually can work with CSV files or non SQL database.
 
+## Example 1
+This example demonstrates how to load SQLite data into B4XTable \
+It uses Android Devices data (JSON) downloaded from https://github.com/pbakondy/android-device-list/
+
+## Example 2
+Another example to demonstrate loading SQLite data into B4XTable \
+It uses fictional Customers data inserted from code
+
 ## Example 3
-This example is modified from example2 but instead of using SQLite, it uses **MinimaListUtils** and **KeyValueStore**.
+This example is modified from Example 2 but instead of using SQLite, it uses **MinimaListUtils** and **KeyValueStore**.
